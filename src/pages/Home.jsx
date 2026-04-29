@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react'; // STEP 1: Added useRef
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All"); // New Feature: Category Filter
+  const [activeCategory, setActiveCategory] = useState("All");
   const navigate = useNavigate();
+
+  // STEP 2: Create a reference for the booking section
+  const bookingSectionRef = useRef(null);
+
+  // STEP 3: Create the scroll function
+  const scrollToBooking = () => {
+    bookingSectionRef.current?.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  };
 
   const categories = ["All", "Blood", "Thyroid", "Diabetes", "Vitamin", "Heart", "Liver", "Kidney"];
 
@@ -19,7 +30,6 @@ const Home = () => {
     { id: 8, icon: "medication", title: "Iron Studies", desc: "Measures iron levels and storage ability.", price: "₹699", color: "bg-sky-500/10 text-sky-600", category: "Blood", precautions: "Morning sample best.", sample: "Blood", time: "24 Hours" }
   ];
 
-  // Enhanced Filter Logic
   const filteredTests = allTests.filter(test => {
     const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "All" || test.category === activeCategory;
@@ -35,7 +45,7 @@ const Home = () => {
       
       <main className="pt-6">
         
-        {/* --- HERO SECTION (Enhanced with Trust Bar) --- */}
+        {/* --- HERO SECTION --- */}
         <section className="relative py-12 lg:py-20 overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
             <div className="flex-1 text-center lg:text-left">
@@ -50,11 +60,16 @@ const Home = () => {
                 Health Checkup <br /> <span className="text-[#0052cc] italic">Simplified.</span>
               </h1>
               <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-semibold">
-                NABL certified labs brought to your doorstep. Get accurate results within 24 hours from India's most trusted diagnostics partner.
+                NABL certified labs brought to your doorstep. Get accurate results within 24 hours.
               </p>
+              
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                <button onClick={() => navigate('/labs')} className="px-10 py-5 bg-[#0052cc] text-white font-black rounded-2xl shadow-xl shadow-[#0052cc]/30 hover:scale-105 transition-all flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
-                  Start Booking <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                {/* STEP 4: Changed navigate to scrollToBooking */}
+                <button 
+                  onClick={scrollToBooking} 
+                  className="px-10 py-5 bg-[#0052cc] text-white font-black rounded-2xl shadow-xl shadow-[#0052cc]/30 hover:scale-105 transition-all flex items-center justify-center gap-3 uppercase text-xs tracking-widest"
+                >
+                  Start Booking <span className="material-symbols-outlined text-sm">arrow_downward</span>
                 </button>
                 <button className="px-10 py-5 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white font-black rounded-2xl hover:bg-slate-50 transition-all uppercase text-xs tracking-widest shadow-sm">
                   Full Body Packages
@@ -67,25 +82,19 @@ const Home = () => {
                 <img 
                   alt="Laboratory Professional" 
                   className="w-full h-full object-cover" 
-                  src="https://images.unsplash.com/photo-1612278247769-af223a6e7d7f?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  src="https://images.unsplash.com/photo-1612278247769-af223a6e7d7f?q=80&w=1170&auto=format&fit=crop"
                 />
-              </div>
-              {/* Floating Stat Card */}
-              <div className="absolute -top-6 -right-6 bg-[#0052cc] p-6 rounded-[2.5rem] shadow-2xl z-20 text-white hidden md:block animate-bounce-slow">
-                 <p className="text-3xl font-black italic">100%</p>
-                 <p className="text-[9px] font-bold uppercase tracking-widest opacity-80">Safety protocol</p>
               </div>
             </div>
           </div>
         </section>
-{/* Add the ID here so the Navbar knows where to scroll */}
-<section id="test-section" className="relative z-30 px-6 -mt-16">
-  <div className="max-w-5xl mx-auto bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl p-4 border border-white dark:border-slate-800 space-y-4">
-    {/* ... your search input and category filters ... */}
-  </div>
-</section>
-        {/* --- SEARCH & CATEGORY FILTER (NEW FEATURE) --- */}
-        <section className="relative z-30 px-6">
+
+        {/* --- SEARCH & CATEGORY FILTER --- */}
+        {/* STEP 5: Added ref and scroll-mt-20 to ensure it doesn't hit the very top of the screen */}
+        <section 
+          ref={bookingSectionRef} 
+          className="relative z-30 px-6 -mt-16 scroll-mt-20"
+        >
           <div className="max-w-5xl mx-auto bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl p-4 border border-white dark:border-slate-800 space-y-4">
             <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-1 relative">
@@ -105,7 +114,6 @@ const Home = () => {
                 </button>
             </div>
             
-            {/* Horizontal Category Scroll */}
             <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 {categories.map((cat) => (
                     <button 
@@ -163,7 +171,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* --- HOW IT WORKS (Refined) --- */}
+        {/* --- HOW IT WORKS --- */}
         <section className="py-32 bg-white dark:bg-slate-900 relative border-y border-slate-100 dark:border-slate-800">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-24">
@@ -181,7 +189,6 @@ const Home = () => {
 
       </main>
 
-      {/* Global CSS for hiding scrollbar */}
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
